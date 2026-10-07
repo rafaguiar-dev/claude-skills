@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Wrapper: usa o ambiente Python da skill analisar-referencia (tem websocket-client, pillow).
+DIR="$(cd "$(dirname "$0")" && pwd)"
+ENV="$DIR/../analisar-referencia"
+export PYTHONIOENCODING=utf-8 PYTHONUTF8=1
+exec uv run --no-sync --project "$ENV" python "$DIR/scripts/occ.py" "$@"

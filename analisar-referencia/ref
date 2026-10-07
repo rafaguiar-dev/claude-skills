@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Atalho: ~/.claude/skills/analisar-referencia/ref <comando> [opções]
+# Usa o ambiente já sincronizado (--no-sync) para não remover o extra "gpu".
+set -e
+DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ ! -d "$DIR/.venv" ]; then
+  echo "[ref] primeira execução: instalando dependências (uv sync)..." >&2
+  uv sync --project "$DIR" >&2
+fi
+export PYTHONIOENCODING=utf-8 PYTHONUTF8=1
+exec uv run --no-sync --project "$DIR" python "$DIR/scripts/ref.py" "$@"
