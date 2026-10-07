@@ -1,0 +1,13 @@
+# So as skills autorais entram. As outras (hyperframes-*, gsap-*, media-use,
+# watch, task-observer, openchatcut...) sao de terceiros e se reinstalam pela fonte.
+/*
+!/.gitignore
+!/README.md
+!/analisar-referencia/
+!/editar-anuncio/
+!/loop-video/
+!/seedance-roteiro/
+
+.venv/
+__pycache__/
+*.pyc
