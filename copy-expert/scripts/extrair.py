@@ -63,12 +63,10 @@ def limpar(s):
     return re.sub(r" ([.,;:?!])", r"\1", s)
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("docx")
-    ap.add_argument("--saida")
-    a = ap.parse_args()
-    paras = ler(a.docx)
+def analisar(docx):
+    """Lê a copy. Devolve (paras, legenda, cores_troca, cores_marcador, inicio, frases, pistas);
+    frases = [(parágrafo, frase)], pistas = [(índice da próxima frase, parágrafo, texto)]."""
+    paras = ler(docx)
 
     # legenda de cores
     # a legenda pode se repetir no meio da copy, então a copy começa no "Segue copy ..." ou,
@@ -86,12 +84,6 @@ def main():
     inicio = inicio_copy if inicio_copy is not None else (fim_legenda + 1 if fim_legenda is not None else 0)
     cores_troca = {c for c, d in legenda.items() if TROCA.search(d)}
     cores_marcador = {c for c, d in legenda.items() if MARCADOR.search(d)} - cores_troca
-
-    print("LEGENDA:")
-    for c, d in legenda.items():
-        tipo = "troca de personagem" if c in cores_troca else "ignorada" if c in cores_marcador else "entra"
-        print(f"  {c:14} {tipo:20} {d}")
-    print(f"Copy começa no parágrafo {inicio}.\n")
 
     frases, pistas = [], []  # pistas: (índice da próxima frase, texto)
     for i in range(inicio, len(paras)):
@@ -116,6 +108,21 @@ def main():
         for x0, x1 in cortes:
             if any(x < x1 and y > x0 for x, y in marcas):
                 frases.append((i, limpar(txt[x0:x1])))
+    return paras, legenda, cores_troca, cores_marcador, inicio, frases, pistas
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("docx")
+    ap.add_argument("--saida")
+    a = ap.parse_args()
+    paras, legenda, cores_troca, cores_marcador, inicio, frases, pistas = analisar(a.docx)
+
+    print("LEGENDA:")
+    for c, d in legenda.items():
+        tipo = "troca de personagem" if c in cores_troca else "ignorada" if c in cores_marcador else "entra"
+        print(f"  {c:14} {tipo:20} {d}")
+    print(f"Copy começa no parágrafo {inicio}.\n")
 
     saida = Path(a.saida) if a.saida else Path(a.docx).with_name(Path(a.docx).stem + " - [expert].txt")
     saida.write_text("\n".join(f"[expert]\n{f}" for _, f in frases) + "\n", encoding="utf-8")
